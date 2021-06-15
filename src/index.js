@@ -1,1 +1,3 @@
-window.alert("Linked JS and webpack")
+import createProject from "./projectView";
+
+createProject();
