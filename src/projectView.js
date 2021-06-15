@@ -1,12 +1,33 @@
 import Project from './projectClass';
-import toDoItem from './toDoClass';
+import ToDoItem from './toDoClass';
 
-let createProject = () => {
-  let mainContent = document.querySelector("#content")
-  let content = document.createElement('h1');
-  content.textContent = "Test";
+
+let createNav = (project) => {
+  let main = document.querySelector("#content");
+  let test = document.createElement('h1')
+  test.textContent = project.projectName;
   
-  mainContent.append(content);
+  main.append(test)
+
+}
+let createContent = (project) => {
+  let main = document.querySelector("#content");
+  project.toDoList.forEach(item => {
+    let div = document.createElement('div');
+    let title = document.createElement('h3');
+    let description = document.createElement('p');
+    let dueDate = document.createElement('p');
+    let priority = document.createElement('p');
+
+    title.textContent = item.title;
+    description.textContent = item.description;
+    dueDate.textContent = item.dueDate;
+    priority.textContent = item.priority;
+
+    div.append(title, description, dueDate, priority);
+    main.append(div);
+  });
+  
 }
 
-export default createProject;
+export default {createNav, createContent};
