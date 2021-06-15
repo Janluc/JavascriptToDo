@@ -3,5 +3,4 @@ export default class Project {
     this.projectName = projectName;
     this.toDoList = [];
   }
-
 }

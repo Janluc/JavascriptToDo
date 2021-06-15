@@ -1,6 +1,7 @@
 import projectView from "./projectView";
 import Project from "./projectClass";
-import ToDoItem from "./toDoClass"
+import ToDoItem from "./toDoClass";
+import './style.css';
 
 
 let defaultProject = new Project("Default!");
