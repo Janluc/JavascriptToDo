@@ -5,12 +5,20 @@ let listOfProjects;
 let currentProject;
 
 let initProjectView = (userProjects) => {
-  listOfProjects = userProjects;
-  currentProject = listOfProjects[0];
+  if(localStorage.getItem('userProjects')){
+    listOfProjects = JSON.parse(localStorage.getItem('userProjects'))
+    currentProject = JSON.parse(localStorage.getItem('currentProject'))
+  } else {
+    listOfProjects = userProjects;
+    currentProject = listOfProjects[0];
+    localStorage.setItem('currentProject', JSON.stringify(currentProject));
+  }
+  
 }
 
 let createNav = (project) => {
   currentProject = project;
+  localStorage.setItem('currentProject', JSON.stringify(currentProject));
   let main = document.querySelector("#content");
   let test = document.createElement('h1')
   test.textContent = project.projectName;
@@ -24,7 +32,6 @@ let createNav = (project) => {
   projectBtn.addEventListener('click', newProjectWindow);
 
   main.append(test, toDoBtn, projectBtn)
-
 }
 
 let createContent = (project) => {
@@ -82,7 +89,12 @@ let newProjectWindow = () => {
   })
   selection.addEventListener('change', changeProject)
 
-  selection.options[listOfProjects.indexOf(currentProject)].selected = 'selected'
+  for (let i in listOfProjects) {
+    if(selection.options[i].value === currentProject.projectName){
+      selection.options[i].selected = 'selected';
+    }
+  }
+
   form.append(projectName, submitProjectForm);
   contentDiv.append(selection, form);
   div.append(contentDiv);
@@ -94,11 +106,12 @@ let submitNewProject = () => {
   let newProject = new Project(projectName);
   currentProject = newProject;
   listOfProjects.push(newProject);
+  localStorage.setItem('userProjects', JSON.stringify(listOfProjects));
+  localStorage.setItem('currentProject', JSON.stringify(currentProject));
   refreshProject(newProject);
 }
 
 let changeProject = (event) => {
-  
   listOfProjects.forEach(item => {
     if(item.projectName === event.target.options[event.target.selectedIndex].value) {
       refreshProject(listOfProjects[listOfProjects.indexOf(item)])
@@ -134,12 +147,10 @@ let newItemWindow = (project) => {
   let submitForm = document.createElement('button')
   submitForm.textContent = "Create To Do";
   submitForm.addEventListener('click', () => submitNewItem(project))
-  
 
   form.append(title, description, dueDate, priority, submitForm)
   contentDiv.append(form);
   div.append(contentDiv);
-
  
   main.append(div);
 }
@@ -151,6 +162,14 @@ let submitNewItem = (project) => {
   let priority = document.querySelector('#priority').value;
 
   project.toDoList.push(new ToDoItem(title, description, dueDate, priority));
+  listOfProjects.forEach(item => {
+    if (item.projectName === project.projectName) {
+        item = project
+    }
+  })
+  
+  localStorage.setItem('userProjects', JSON.stringify(listOfProjects));
+
   refreshProject(project);
 }
 
