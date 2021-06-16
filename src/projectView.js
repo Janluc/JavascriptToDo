@@ -1,18 +1,32 @@
 import Project from './projectClass';
 import ToDoItem from './toDoClass';
 
+let listOfProjects;
+let currentProject;
+
+let initProjectView = (userProjects) => {
+  listOfProjects = userProjects;
+  currentProject = listOfProjects[0];
+}
+
 let createNav = (project) => {
+  currentProject = project;
   let main = document.querySelector("#content");
   let test = document.createElement('h1')
   test.textContent = project.projectName;
 
-  let btn = document.createElement('button');
-  btn.textContent = "+"
-  btn.addEventListener('click', () => newItemWindow(project));
-  
-  main.append(test, btn)
+  let toDoBtn = document.createElement('button');
+  toDoBtn.textContent = "New Task!"
+  toDoBtn.addEventListener('click', () => newItemWindow(project));
+
+  let projectBtn = document.createElement('button');
+  projectBtn.textContent = '+';
+  projectBtn.addEventListener('click', newProjectWindow);
+
+  main.append(test, toDoBtn, projectBtn)
 
 }
+
 let createContent = (project) => {
   let main = document.querySelector("#content");
   project.toDoList.forEach(item => {
@@ -32,12 +46,71 @@ let createContent = (project) => {
   });
 }
 
+let createModal = (modalContent) => {
+  let div = document.createElement('div');
+  div.classList.add('modal');
+
+  window.onclick = (event) => {
+    if(event.target === div) {
+      div.style.display = 'none';
+    }
+  }
+  modalContent.classList.add('modal-content')
+  return div;
+}
+
+let newProjectWindow = () => {
+  let main = document.querySelector('#content');
+  let contentDiv = document.createElement('div');
+  let div = createModal(contentDiv);  
+  let form = document.createElement('form');
+
+  let projectName = document.createElement('input');
+  projectName.setAttribute('id', 'projectName');
+  projectName.setAttribute('type', 'text');
+  projectName.setAttribute('placeholder', 'New Project Name');
+
+  let submitProjectForm = document.createElement('button')
+  submitProjectForm.textContent = 'Create New Project';
+  submitProjectForm.addEventListener('click', submitNewProject);
+  
+  let selection = document.createElement('select');
+  listOfProjects.forEach(item => {
+    let option = document.createElement('option');
+    option.textContent = item.projectName;
+    selection.add(option);
+  })
+  selection.addEventListener('change', changeProject)
+
+  selection.options[listOfProjects.indexOf(currentProject)].selected = 'selected'
+  form.append(projectName, submitProjectForm);
+  contentDiv.append(selection, form);
+  div.append(contentDiv);
+  main.append(div);
+}
+
+let submitNewProject = () => {
+  let projectName = document.querySelector('#projectName').value;
+  let newProject = new Project(projectName);
+  currentProject = newProject;
+  listOfProjects.push(newProject);
+  refreshProject(newProject);
+}
+
+let changeProject = (event) => {
+  
+  listOfProjects.forEach(item => {
+    if(item.projectName === event.target.options[event.target.selectedIndex].value) {
+      refreshProject(listOfProjects[listOfProjects.indexOf(item)])
+    }
+  })
+}
+
 let newItemWindow = (project) => {
   let main = document.querySelector("#content");
-  let div = document.createElement('div');
-  div.classList.add('modal')
-
   let contentDiv = document.createElement('div');
+  let div = createModal(contentDiv);
+
   let form = document.createElement('form');
   let title = document.createElement('input');
   title.setAttribute('id', 'title');
@@ -61,12 +134,13 @@ let newItemWindow = (project) => {
   let submitForm = document.createElement('button')
   submitForm.textContent = "Create To Do";
   submitForm.addEventListener('click', () => submitNewItem(project))
+  
 
   form.append(title, description, dueDate, priority, submitForm)
   contentDiv.append(form);
   div.append(contentDiv);
 
-  contentDiv.classList.add('modal-content')
+ 
   main.append(div);
 }
 
@@ -89,4 +163,4 @@ let refreshProject = (project) => {
   createContent(project);
 }
 
-export default {createNav, createContent};
+export default {initProjectView, createNav, createContent};
