@@ -1,6 +1,7 @@
 import projectView from "./projectView";
 import Project from "./projectClass";
 import ToDoItem from "./toDoClass";
+import {format} from 'date-fns'
 import './style.css';
 
 let userProjects = []
@@ -14,7 +15,7 @@ if(localStorage.getItem('userProjects')){
 } else {
   
   let defaultProject = new Project("Default!");
-  defaultProject.toDoList.push(new ToDoItem("Test", "Some desc", "date", 1)); 
+  defaultProject.toDoList.push(new ToDoItem("Test", "Some desc", format(new Date(2021, 6, 24), 'M/d/yyyy'), 1)); 
   
   userProjects.push(defaultProject);
   localStorage.setItem('userProjects', JSON.stringify(userProjects));
