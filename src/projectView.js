@@ -5,6 +5,7 @@ import {format} from 'date-fns';
 let listOfProjects;
 let currentProject;
 let sortedSelect = 0;
+let sideBarActive = false;
 let initProjectView = (userProjects) => {
   if(localStorage.getItem('userProjects')){
     listOfProjects = JSON.parse(localStorage.getItem('userProjects'));
@@ -38,9 +39,10 @@ let createNav = (project) => {
     toDoBtn.textContent = '◘'
   })
 
+
   let projectBtn = document.createElement('button');
   projectBtn.textContent = '+';
-  projectBtn.addEventListener('click', newProjectWindow);
+  projectBtn.addEventListener('click', () => ActivateSidebar(project));
 
   let projectHoverHandle;
   projectBtn.addEventListener('mouseover', () => {
@@ -64,132 +66,13 @@ let createNav = (project) => {
     deleteProjectBtn.textContent = 'X'
   })
 
+  createSidebar();
   nav.append(deleteProjectBtn, projectHeader, toDoBtn, projectBtn);
   main.append(nav);
 }
 
-let deleteProjectAlert = () => {
-  let main = document.querySelector('#content');
+let createSidebar = () => {
   let contentDiv = document.createElement('div');
-  let div = createModal(contentDiv);
-
-  let warningTitle = document.createElement('h3');
-  warningTitle.textContent = "Are you sure you would like to delete this project?"
-  
-  let warningBtn = document.createElement('button');
-  warningBtn.textContent = `Yes, delete ${currentProject.projectName}`;
-  warningBtn.addEventListener('click', deleteProjectConfirmation)
-
-  contentDiv.append(warningTitle, warningBtn);
-
-  div.append(contentDiv);
-  main.append(div);
-
-}
-
-let deleteProjectConfirmation = () => {
-  for (let item in listOfProjects){
-    if(listOfProjects[item] === currentProject) {
-      listOfProjects.splice(item, 1);
-    }
-  }
-  localStorage.setItem('userProjects', JSON.stringify(listOfProjects));
-  currentProject = listOfProjects[0];
-
-  refreshProject(currentProject);
-}
-
-let createContent = (project, list = []) => {
-  let main = document.querySelector("#content");
-  let counter = 0;
-  let itemArea = document.createElement('div')
-  let arr;
-  itemArea.classList.add('to-do-area')
-  itemArea.classList.add(currentProject.backgroundColor)
-
-  if(list.length === 0) {
-    arr = project.toDoList;
-  } else {
-    arr = list;
-  }
-  
-  arr.forEach(item => {
-    let div = document.createElement('div');
-    div.setAttribute('data-index', counter);
-    div.classList.add('to-do-item');
-
-    let title = document.createElement('h3');
-    let description = document.createElement('p');
-    let dueDate = document.createElement('p');
-    let priority = document.createElement('span');
-    let deleteBtn = document.createElement('button')
-    deleteBtn.textContent = 'X';
-    deleteBtn.addEventListener('click', deleteToDoItem)
-
-    title.textContent = item.title;
-    description.textContent = item.description;
-    dueDate.textContent = item.dueDate;
-    console.log(item.priority);
-
-    priority.classList.add('priority-set')
-    priority.classList.add(JSON.parse(item.priority) === 1 ? 'low-priority' : JSON.parse(item.priority) === 2 ? 'mid-priority' : 'high-priority');
-    div.append(title, description, dueDate, deleteBtn, priority);
-    itemArea.append(div);
-    counter++;
-  });
-  main.append(itemArea);
-}
-
-let sortByDate = (project) => {
-  let newArr = new Project(project.projectName);
-  newArr.toDoList = [...project.toDoList]
-  newArr.toDoList.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
-  return newArr.toDoList;
-}
-
-let sortByPriority = (project) => {
-  let newArr = new Project(project.projectName);
-  newArr.toDoList = [...project.toDoList]
-  newArr.toDoList.sort((a, b) => b.priority - a.priority)
-  return newArr.toDoList;
-}
-
-let deleteToDoItem = (event) => {
-  const index = event.target.parentNode.dataset.index
-  currentProject.toDoList.splice(index, 1);
-  listOfProjects.forEach(item => {
-    if (item.projectName === currentProject.projectName) {
-        item = currentProject
-        return;
-    }
-  })
-
-  localStorage.setItem('userProjects', JSON.stringify(listOfProjects));
-  refreshProject(currentProject);
-}
-
-let createModal = (modalContent) => {
-  let div = document.createElement('div');
-  div.classList.add('modal');
-
-  window.onclick = (event) => {
-    if(event.target === div) {
-      div.remove();
-    }
-  }
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape'){
-      div.remove();
-    }
-  })
-  modalContent.classList.add('modal-content')
-  return div;
-}
-
-let newProjectWindow = () => {
-  let main = document.querySelector('#content');
-  let contentDiv = document.createElement('div');
-  let div = createModal(contentDiv);  
   let form = document.createElement('form');
 
   let projectName = document.createElement('input');
@@ -263,8 +146,184 @@ let newProjectWindow = () => {
 
   form.append(projectName, submitProjectForm);
   contentDiv.append(selection, sortDiv, colorDiv, form);
+  
+  document.querySelector('.sidebar').append(contentDiv);
+}
+
+let deleteProjectAlert = () => {
+  let main = document.querySelector('#content');
+  let contentDiv = document.createElement('div');
+  let div = createModal(contentDiv);
+
+  let warningTitle = document.createElement('h3');
+  warningTitle.textContent = "Are you sure you would like to delete this project?"
+  
+  let warningBtn = document.createElement('button');
+  warningBtn.textContent = `Yes, delete ${currentProject.projectName}`;
+  warningBtn.addEventListener('click', deleteProjectConfirmation)
+
+  contentDiv.append(warningTitle, warningBtn);
+
   div.append(contentDiv);
   main.append(div);
+
+}
+
+let deleteProjectConfirmation = () => {
+  for (let item in listOfProjects){
+    if(listOfProjects[item] === currentProject) {
+      listOfProjects.splice(item, 1);
+    }
+  }
+  localStorage.setItem('userProjects', JSON.stringify(listOfProjects));
+  currentProject = listOfProjects[0];
+
+  refreshProject(currentProject);
+}
+
+let createContent = (project, list = []) => {
+  let main = document.querySelector("#content");
+  let counter = 0;
+  let itemArea = document.createElement('div')
+  let arr;
+  itemArea.classList.add('to-do-area')
+  itemArea.classList.add(currentProject.backgroundColor)
+  if(sideBarActive) {
+    main.style.marginRight = '250px'
+    document.querySelector('nav').style.position = 'relative'
+  }
+
+  if(list.length === 0) {
+    arr = project.toDoList;
+  } else {
+    arr = list;
+  }
+  
+  arr.forEach(item => {
+    let div = document.createElement('div');
+    div.setAttribute('data-index', counter);
+    div.classList.add('to-do-item');
+
+    div.addEventListener('click', (e) => zoomItem(e, item))
+
+    let title = document.createElement('h3');
+    let description = document.createElement('p');
+    let dueDate = document.createElement('p');
+    let priority = document.createElement('span');
+    let deleteBtn = document.createElement('button')
+    deleteBtn.textContent = 'X';
+    deleteBtn.addEventListener('click', deleteToDoItem)
+    deleteBtn.classList.add('item-delete')
+
+    title.textContent = item.title;
+    description.textContent = item.description;
+    dueDate.textContent = item.dueDate;
+    console.log(item.priority);
+
+    priority.classList.add('priority-set')
+    priority.classList.add(JSON.parse(item.priority) === 1 ? 'low-priority' : JSON.parse(item.priority) === 2 ? 'mid-priority' : 'high-priority');
+    div.append(title, description, dueDate, deleteBtn, priority);
+    itemArea.append(div);
+    counter++;
+  });
+  main.append(itemArea);
+}
+
+let sortByDate = (project) => {
+  let newArr = new Project(project.projectName);
+  newArr.toDoList = [...project.toDoList]
+  newArr.toDoList.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
+  return newArr.toDoList;
+}
+
+let sortByPriority = (project) => {
+  let newArr = new Project(project.projectName);
+  newArr.toDoList = [...project.toDoList]
+  newArr.toDoList.sort((a, b) => b.priority - a.priority)
+  return newArr.toDoList;
+}
+
+let deleteToDoItem = (event) => {
+  const index = event.target.parentNode.dataset.index
+  currentProject.toDoList.splice(index, 1);
+  listOfProjects.forEach(item => {
+    if (item.projectName === currentProject.projectName) {
+        item = currentProject
+        return;
+    }
+  })
+
+  localStorage.setItem('userProjects', JSON.stringify(listOfProjects));
+  refreshProject(currentProject);
+}
+
+let zoomItem = (e ,item) => {
+  console.log(e.target);
+  if (e.target.classList.contains('item-delete')){
+    return;
+  }
+  let main = document.querySelector('#content')
+  let contentDiv = document.createElement('div')
+  let div = createModal(contentDiv);
+
+  let title = document.createElement('input')
+  title.setAttribute('id', 'title');
+  title.setAttribute('type', 'input')
+  title.value = item.title;
+  title.addEventListener('change', () => {item.title = title.value;})
+  let description = document.createElement('textarea');
+  description.textContent = item.description;
+  let date = document.createElement('p');
+  date.textContent = item.dueDate;
+
+
+  contentDiv.append(title, description, date);
+  div.append(contentDiv)
+  main.append(div)
+}
+
+let createModal = (modalContent) => {
+  let div = document.createElement('div');
+  div.classList.add('modal');
+
+  window.onclick = (event) => {
+    if(event.target === div) {
+      div.remove();
+    }
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape'){
+      console.log('test')
+      div.remove();
+
+      document.removeEventListener('keydown', false);
+    }
+  })
+  modalContent.classList.add('modal-content')
+  return div;
+}
+
+let ActivateSidebar = () => {
+  sideBarActive = true;
+  
+  let main = document.querySelector('#content');
+
+  let sideBar = document.querySelector('.sidebar');
+
+
+  sideBar.style.width = '250px';
+  main.style.marginRight = '250px'
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape')
+    {
+      sideBar.style.width = '0';
+      main.style.marginRight = '0';
+      sideBarActive = false
+    }
+
+  });
+
 }
 
 let makeColorSection = () => {
@@ -314,6 +373,7 @@ let changeProjectColor = (color, currentColor, currentNavColor) => {
   listOfProjects.forEach(item => {
     if (item.projectName === currentProject.projectName) {
       item == currentProject
+      console.log(currentProject)
     }
   })
 
@@ -326,18 +386,24 @@ let changeProjectColor = (color, currentColor, currentNavColor) => {
   localStorage.setItem('userProjects', JSON.stringify(listOfProjects));
 }
 
-let submitNewProject = () => {
+let submitNewProject = (e) => {
+  console.log(listOfProjects) 
+  e.preventDefault();
+  
   let projectName = document.querySelector('#projectName').value;
   let newProject = new Project(projectName);
   currentProject = newProject;
   listOfProjects.push(currentProject);
+  
   localStorage.setItem('userProjects', JSON.stringify(listOfProjects));
   localStorage.setItem('currentProject', JSON.stringify(currentProject));
   refreshProject(currentProject);
 }
 
 let changeProject = (event) => {
-  listOfProjects = JSON.parse(localStorage.getItem('userProjects'))
+
+  event.preventDefault();
+  listOfProjects = JSON.parse(localStorage.getItem('userProjects'));
   listOfProjects.forEach(item => {
     if(item.projectName === event.target.options[event.target.selectedIndex].value) {
       sortedSelect = 0;
@@ -373,7 +439,8 @@ let newItemWindow = (project) => {
 
   let submitForm = document.createElement('button')
   submitForm.textContent = "Create To Do";
-  submitForm.addEventListener('click', () => submitNewItem(project))
+
+  form.addEventListener('submit', (e) => submitNewItem(e, project));
 
   form.append(title, description, dueDate, priority, submitForm)
   contentDiv.append(form);
@@ -382,28 +449,46 @@ let newItemWindow = (project) => {
   main.append(div);
 }
 
-let submitNewItem = (project) => {
+let submitNewItem = (e, project) => {
+  e.preventDefault();
   let title = document.querySelector('#title').value;
   let description = document.querySelector('#description').value;
   let dueDate = document.querySelector('#dueDate').value;
   let priority = document.querySelector('#priority').value;
-  let date = new Date(dueDate);
-
-  project.toDoList.push(new ToDoItem(title, description, format(new Date(date.getTime() + date.getTimezoneOffset() * 60000), 'M/d/yyyy'), priority));
-  listOfProjects.forEach(item => {
-    if (item.projectName === project.projectName) {
-        item = project;
-        return;
+ 
+  
+  if(!title || !description || !dueDate || !priority) {
+    if(!document.querySelector('.error')) {
+      let err = document.createElement('p')
+      err.classList.add('error');
+      err.textContent = 'No field can be left blank!';
+      document.querySelector('form').prepend(err);
     }
-  })
-  localStorage.setItem('userProjects', JSON.stringify(listOfProjects));
-  refreshProject(project);
+    
+  } else {
+    let date = new Date(dueDate);
+    project.toDoList.push(new ToDoItem(title, description, format(new Date(date.getTime() + date.getTimezoneOffset() * 60000), 'M/d/yyyy'), priority));
+    listOfProjects.forEach(item => {
+      if (item.projectName === project.projectName) {
+          item.toDoList = project.toDoList;
+          console.log('added new item');
+      }
+    })
+    localStorage.setItem('userProjects', JSON.stringify(listOfProjects));
+    console.log(listOfProjects);
+    refreshProject(project);
+  }
+ 
 } 
 
 let refreshProject = (project, arr = []) => {
   let main = document.querySelector("#content");
   while (main.firstChild) {
     main.removeChild(main.firstChild);
+  }
+  let sideBar = document.querySelector('.sidebar');
+  while (sideBar.firstChild) {
+    sideBar.removeChild(sideBar.firstChild);
   }
   createNav(project);
   if(arr.length === 0) {

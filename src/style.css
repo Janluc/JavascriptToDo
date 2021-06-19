@@ -36,7 +36,9 @@ html,
 body {
   height: 100%;
 }
-
+#content {
+  transition: margin-right  0.5s ease-in-out;
+}
 .modal {
   position: fixed; 
   z-index: 3; 
@@ -61,7 +63,7 @@ body {
 }
 
 nav {
-  position: fixed;
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -72,6 +74,7 @@ nav {
   color: white;
   box-shadow: 1px 1px 15px 3px black;
   transition: all 0.2s ease-in-out;
+  overflow: visible;
 }
 nav button {
   transition: all 0.2s ease-in-out;
@@ -91,7 +94,6 @@ nav button:hover {
   display: flex;
   justify-content: space-around;
   flex-wrap: wrap;
-  padding-top: 10%;
   min-height: 100vh;
   align-items: baseline;
   transition: all 0.2s ease-in-out;
@@ -148,7 +150,7 @@ nav button:hover {
   position: relative;
   display: flex;
   flex-direction: column;
-  background-color: lightgray;
+  background-color: white;
   border: 6px solid rgb(153, 153, 153);
   width: 300px;
   height: 300px;
@@ -167,12 +169,27 @@ nav button:hover {
   padding: 20px 0;
   font-size: xx-large;
 }
-.to-do-item button {
+
+.item-delete {
   position: absolute;
   right: 5px;
   top: 5px;
   width: fit-content;
   border-radius: 50px;
+  z-index: 2;
+}
+
+.sidebar {
+  height: 100%; /* 100% Full-height */
+  width: 0; /* 0 width - change this with JavaScript */
+  position: fixed; /* Stay in place */
+  z-index: 4; /* Stay on top */
+  top: 0;
+  right: 0;
+  background-color: #111; /* Black*/
+  overflow-x: hidden; /* Disable horizontal scroll */
+  padding-top: 60px; /* Place content 60px from the top */
+  transition: all 0.5s ease-in-out; /* 0.5 second transition effect to slide in the sidebar */
 }
 
 .priority-set {
