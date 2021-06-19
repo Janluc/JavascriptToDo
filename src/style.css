@@ -70,7 +70,6 @@ nav {
   height: 10vh;
   width: 100%;
   background-color: white;
-  z-index: 2;
   color: white;
   box-shadow: 1px 1px 15px 3px black;
   transition: all 0.2s ease-in-out;

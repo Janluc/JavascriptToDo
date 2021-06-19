@@ -187,10 +187,9 @@ let createContent = (project, list = []) => {
   let itemArea = document.createElement('div')
   let arr;
   itemArea.classList.add('to-do-area')
-  itemArea.classList.add(currentProject.backgroundColor)
+  itemArea.classList.add(project.backgroundColor)
   if(sideBarActive) {
     main.style.marginRight = '250px'
-    document.querySelector('nav').style.position = 'relative'
   }
 
   if(list.length === 0) {
@@ -368,11 +367,9 @@ let changeProjectColor = (color, currentColor, currentNavColor) => {
   }
   const itemArea = document.querySelector('.to-do-area')
   const nav = document.querySelector('nav')
-  localStorage.setItem('currentProject', JSON.stringify(currentProject));
-  listOfProjects = JSON.parse(localStorage.getItem('userProjects'));
   listOfProjects.forEach(item => {
     if (item.projectName === currentProject.projectName) {
-      item == currentProject
+      item = currentProject
       console.log(currentProject)
     }
   })
@@ -382,6 +379,7 @@ let changeProjectColor = (color, currentColor, currentNavColor) => {
 
   itemArea.classList.add(currentProject.backgroundColor);
   nav.classList.add(currentProject.navColor);
+  localStorage.setItem('currentProject', JSON.stringify(currentProject));
 
   localStorage.setItem('userProjects', JSON.stringify(listOfProjects));
 }
