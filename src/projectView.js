@@ -6,6 +6,7 @@ let listOfProjects;
 let currentProject;
 let sortedSelect = 0;
 let sideBarActive = false;
+
 let initProjectView = (userProjects) => {
   if(localStorage.getItem('userProjects')){
     listOfProjects = JSON.parse(localStorage.getItem('userProjects'));
@@ -71,11 +72,35 @@ let createNav = (project) => {
   main.append(nav);
 }
 
+let sortItems = (e) => {
+  if (e.target.options[e.target.selectedIndex].value === 'None') {
+    sortedSelect = 0;
+    refreshProject(currentProject)
+  }
+  else if (e.target.options[e.target.selectedIndex].value === 'By Priority'){
+    sortedSelect = 1;
+    refreshProject(currentProject, sortByPriority(currentProject));
+  } 
+  else if (e.target.options[e.target.selectedIndex].value === 'By Date') {
+    sortedSelect = 2;
+    refreshProject(currentProject, sortByDate(currentProject));
+  } else {
+    sortedSelect = 3;
+    let project = new Project(currentProject.projectName);
+    project.toDoList = sortByDate(currentProject)
+    let newArr = sortByPriority(project);
+    console.log(newArr);
+    refreshProject(currentProject, newArr);
+  }
+} 
+
 let createSidebar = () => {
   let contentDiv = document.createElement('div');
   let form = document.createElement('form');
 
+  let projectNameLabel = document.createElement('p');
   let projectName = document.createElement('input');
+  projectNameLabel.textContent = 'Create a New Project!';
   projectName.setAttribute('id', 'projectName');
   projectName.setAttribute('type', 'text');
   projectName.setAttribute('placeholder', 'New Project Name');
@@ -84,52 +109,37 @@ let createSidebar = () => {
   submitProjectForm.textContent = 'Create New Project';
   submitProjectForm.addEventListener('click', submitNewProject);
 
+  let colorLabel = document.createElement('p');
   let colorDiv = makeColorSection();
+  colorLabel.textContent = 'Choose a Project color!';
 
   let sortDiv = document.createElement('div');
+  let sortLabel = document.createElement('p');
   let sortSelection = document.createElement('select');
   let noneOption = document.createElement('option');
   let priorityOption = document.createElement('option');
   let dateOption = document.createElement('option');
   let prioDateOption = document.createElement('option');
+  sortLabel.textContent = 'Sort Items'
   noneOption.textContent = 'None';
   priorityOption.textContent = 'By Priority';
   dateOption.textContent = 'By Date';
   prioDateOption.textContent = 'Both Priority and Date'
   
-  sortSelection.addEventListener('change', (e) => {
-    if (e.target.options[e.target.selectedIndex].value === 'None') {
-      sortedSelect = 0;
-      refreshProject(currentProject)
-    }
-    else if (e.target.options[e.target.selectedIndex].value === 'By Priority'){
-      sortedSelect = 1;
-      refreshProject(currentProject, sortByPriority(currentProject));
-    } 
-    else if (e.target.options[e.target.selectedIndex].value === 'By Date') {
-      sortedSelect = 2;
-      refreshProject(currentProject, sortByDate(currentProject));
-    } else {
-      sortedSelect = 3;
-      let project = new Project(currentProject.projectName);
-      project.toDoList = sortByDate(currentProject)
-      let newArr = sortByPriority(project);
-      console.log(newArr);
-      refreshProject(currentProject, newArr);
-    }
-  })
-  
+  sortSelection.addEventListener('change', sortItems)
 
   sortSelection.add(noneOption);
   sortSelection.add(priorityOption);
   sortSelection.add(dateOption);
   sortSelection.add(prioDateOption);
   
-  sortDiv.append(sortSelection);
+  sortDiv.append(sortLabel, sortSelection);
 
   sortSelection.options[sortedSelect].selected = 'selected';
   
+  let selectionLabel = document.createElement('p');
   let selection = document.createElement('select');
+  selectionLabel.textContent = 'Choose a Project!'
   listOfProjects.forEach(item => {
     let option = document.createElement('option');
     option.textContent = item.projectName;
@@ -145,12 +155,15 @@ let createSidebar = () => {
 
 
   form.append(projectName, submitProjectForm);
-  contentDiv.append(selection, sortDiv, colorDiv, form);
+  contentDiv.append(selectionLabel, selection, sortDiv, colorLabel, colorDiv, projectNameLabel, form);
   
   document.querySelector('.sidebar').append(contentDiv);
 }
 
 let deleteProjectAlert = () => {
+  if(sideBarActive) {
+    ActivateSidebar();
+  }
   let main = document.querySelector('#content');
   let contentDiv = document.createElement('div');
   let div = createModal(contentDiv);
@@ -294,8 +307,6 @@ let createModal = (modalContent) => {
     if (e.key === 'Escape'){
       console.log('test')
       div.remove();
-
-      document.removeEventListener('keydown', false);
     }
   })
   modalContent.classList.add('modal-content')
@@ -303,12 +314,18 @@ let createModal = (modalContent) => {
 }
 
 let ActivateSidebar = () => {
-  sideBarActive = true;
-  
+  console.log('test')
   let main = document.querySelector('#content');
-
   let sideBar = document.querySelector('.sidebar');
 
+  if (sideBarActive) {
+    sideBar.style.width = '0';
+    main.style.marginRight = '0';
+    sideBarActive = false;
+    return;
+  }
+  
+  sideBarActive = true;
 
   sideBar.style.width = '250px';
   main.style.marginRight = '250px'
@@ -322,6 +339,8 @@ let ActivateSidebar = () => {
     }
 
   });
+
+
 
 }
 
@@ -389,13 +408,23 @@ let submitNewProject = (e) => {
   e.preventDefault();
   
   let projectName = document.querySelector('#projectName').value;
-  let newProject = new Project(projectName);
-  currentProject = newProject;
-  listOfProjects.push(currentProject);
-  
-  localStorage.setItem('userProjects', JSON.stringify(listOfProjects));
-  localStorage.setItem('currentProject', JSON.stringify(currentProject));
-  refreshProject(currentProject);
+  if (!projectName) {
+    if(!document.querySelector('.error')) {
+      let err = document.createElement('p');
+      err.classList.add('error');
+      err.textContent = 'Project name cannot be blank!';
+      document.querySelector('.sidebar').append(err);
+    }
+  } 
+  else {
+    let newProject = new Project(projectName);
+    currentProject = newProject;
+    listOfProjects.push(currentProject);
+    
+    localStorage.setItem('userProjects', JSON.stringify(listOfProjects));
+    localStorage.setItem('currentProject', JSON.stringify(currentProject));
+    refreshProject(currentProject);
+  }
 }
 
 let changeProject = (event) => {
@@ -411,28 +440,41 @@ let changeProject = (event) => {
 }
 
 let newItemWindow = (project) => {
+  if(sideBarActive) {
+    ActivateSidebar();
+  }
   let main = document.querySelector("#content");
   let contentDiv = document.createElement('div');
   let div = createModal(contentDiv);
 
   let form = document.createElement('form');
   let title = document.createElement('input');
+  let titleLabel = document.createElement('p');
+  titleLabel.textContent = 'Task Name';
   title.setAttribute('id', 'title');
   title.setAttribute('type', 'text');
-  title.setAttribute('placeholder', 'Title');
+  title.setAttribute('placeholder', 'Taskname');
 
   let description = document.createElement('input');
+  let descriptionLabel = document.createElement('p');
+  descriptionLabel.textContent = 'Description'
   description.setAttribute('id', 'description');
   description.setAttribute('type', 'text');
   description.setAttribute('placeholder', 'Description');
 
   let dueDate = document.createElement('input');
+  let dueDateLabel = document.createElement('p')
+  dueDateLabel.textContent = 'Due Date'
   dueDate.setAttribute('id', 'dueDate');
   dueDate.setAttribute('type', 'date');
 
   let priority = document.createElement('input');
+  let priorityLabel = document.createElement('p')
+  priorityLabel.textContent = 'Priorty Level'
   priority.setAttribute('id', 'priority');
-  priority.setAttribute('type', 'text');
+  priority.setAttribute('type', 'number');
+  priority.setAttribute('min', '1')
+  priority.setAttribute('max', '3')
   priority.setAttribute('placeholder', 'Priority')
 
   let submitForm = document.createElement('button')
@@ -440,7 +482,7 @@ let newItemWindow = (project) => {
 
   form.addEventListener('submit', (e) => submitNewItem(e, project));
 
-  form.append(title, description, dueDate, priority, submitForm)
+  form.append(titleLabel, title, descriptionLabel, description, dueDateLabel, dueDate, priorityLabel, priority, submitForm)
   contentDiv.append(form);
   div.append(contentDiv);
  
@@ -457,13 +499,14 @@ let submitNewItem = (e, project) => {
   
   if(!title || !description || !dueDate || !priority) {
     if(!document.querySelector('.error')) {
-      let err = document.createElement('p')
+      let err = document.createElement('p');
       err.classList.add('error');
       err.textContent = 'No field can be left blank!';
-      document.querySelector('form').prepend(err);
+      document.querySelector('.modal-content').prepend(err);
     }
     
-  } else {
+  } 
+  else {
     let date = new Date(dueDate);
     project.toDoList.push(new ToDoItem(title, description, format(new Date(date.getTime() + date.getTimezoneOffset() * 60000), 'M/d/yyyy'), priority));
     listOfProjects.forEach(item => {

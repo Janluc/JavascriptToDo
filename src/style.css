@@ -62,6 +62,10 @@ body {
   border-radius: 25px;
 }
 
+.error {
+  color: crimson;
+}
+
 nav {
   position: relative;
   display: flex;
@@ -179,16 +183,17 @@ nav button:hover {
 }
 
 .sidebar {
-  height: 100%; /* 100% Full-height */
-  width: 0; /* 0 width - change this with JavaScript */
-  position: fixed; /* Stay in place */
-  z-index: 4; /* Stay on top */
+  height: 100%; 
+  width: 0; 
+  position: fixed; 
+  z-index: 4;
   top: 0;
-  right: 0;
-  background-color: #111; /* Black*/
-  overflow-x: hidden; /* Disable horizontal scroll */
-  padding-top: 60px; /* Place content 60px from the top */
-  transition: all 0.5s ease-in-out; /* 0.5 second transition effect to slide in the sidebar */
+  right: 0; 
+  background-color: rgb(240, 240, 240); 
+  overflow-x: hidden;
+  padding-top: 60px; 
+  transition: all 0.5s ease-in-out; 
+  
 }
 
 .priority-set {

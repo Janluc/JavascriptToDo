@@ -4,7 +4,6 @@ import ToDoItem from "./toDoClass";
 import {format} from 'date-fns'
 import './style.css';
 
-
 let userProjects = []
 if(localStorage.getItem('userProjects')){
 
