@@ -62,6 +62,22 @@ body {
   border-radius: 25px;
 }
 
+.modal-content h2 {
+  text-align: center;
+}
+.modal-content p {
+  margin: 20px 0;
+  font-size: 28px;
+}
+
+.modal-content input { 
+  font-size: 26px;
+}
+
+.modal-content button {
+  font-size: 24px;
+}
+
 .error {
   color: crimson;
 }
@@ -173,6 +189,25 @@ nav button:hover {
   font-size: xx-large;
 }
 
+.to-do-item p {
+  text-align: center;
+  font-size: 32px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* number of lines to show */
+  -webkit-box-orient: vertical;
+  
+}
+
+.to-do-item p:nth-child(even)  {
+  font-size: 24px;
+
+}
+
+.item-date {
+  margin-top: auto;
+}
 .item-delete {
   position: absolute;
   right: 5px;
@@ -193,14 +228,18 @@ nav button:hover {
   overflow-x: hidden;
   padding-top: 60px; 
   transition: all 0.5s ease-in-out; 
+  font-size: 1.3rem;
   
+}
+
+.sidebar p{
+  margin: 10px 0;
 }
 
 .priority-set {
   display: block;
   width: 100%;
   height: 20px;
-  margin-top: auto;
 }
 
 .low-priority {

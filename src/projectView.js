@@ -1,6 +1,6 @@
 import Project from './projectClass';
-import ToDoItem from './toDoClass';
-import {format} from 'date-fns';
+import {deleteItem, saveProjectColor, addNewProject, addNewItem} from './storedProjectManager'
+
 
 let listOfProjects;
 let currentProject;
@@ -19,8 +19,10 @@ let initProjectView = (userProjects) => {
 }
 
 let createNav = (project) => {
-  currentProject = project;
+  currentProject = new Project(project.projectName, project.toDoList, project.backgroundColor, project.navColor);
+
   localStorage.setItem('currentProject', JSON.stringify(currentProject));
+
   let main = document.querySelector("#content");
   let nav = document.createElement('nav');
   let projectHeader = document.createElement('h1');
@@ -32,13 +34,8 @@ let createNav = (project) => {
   toDoBtn.textContent = "◘";
   toDoBtn.addEventListener('click', () => newItemWindow(project));
   let toDoTimerHandle;
-  toDoBtn.addEventListener('mouseover', () => {
-    toDoTimerHandle = setTimeout(() => {toDoBtn.textContent = 'New Task! ◘'}, 200)
-  })
-  toDoBtn.addEventListener('mouseleave', () => {
-    clearTimeout(toDoTimerHandle);
-    toDoBtn.textContent = '◘'
-  })
+  toDoBtn.addEventListener('mouseover', () => { toDoTimerHandle = setTimeout(() => {toDoBtn.textContent = 'New Task! ◘'}, 200)})
+  toDoBtn.addEventListener('mouseleave', () => { clearTimeout(toDoTimerHandle);toDoBtn.textContent = '◘'})
 
 
   let projectBtn = document.createElement('button');
@@ -46,26 +43,16 @@ let createNav = (project) => {
   projectBtn.addEventListener('click', () => ActivateSidebar(project));
 
   let projectHoverHandle;
-  projectBtn.addEventListener('mouseover', () => {
-    projectHoverHandle = setTimeout(() => projectBtn.textContent = 'Add/Change Projects +', 200)
-  })
-  projectBtn.addEventListener('mouseleave', () => {
-    clearTimeout(projectHoverHandle); 
-    projectBtn.textContent = '+'
-  })
+  projectBtn.addEventListener('mouseover', () => { projectHoverHandle = setTimeout(() => projectBtn.textContent = 'Add/Change Projects +', 200)})
+  projectBtn.addEventListener('mouseleave', () => { clearTimeout(projectHoverHandle); projectBtn.textContent = '+'})
 
   let deleteProjectBtn = document.createElement('button');
   deleteProjectBtn.textContent = 'X';
   deleteProjectBtn.addEventListener('click', deleteProjectAlert);
 
   let deleteBtnTimerHandle;
-  deleteProjectBtn.addEventListener('mouseover', ()=> {
-   deleteBtnTimerHandle = setTimeout(() => { deleteProjectBtn.textContent = "X Delete Project"}, 200) 
-  })
-  deleteProjectBtn.addEventListener('mouseleave', () => {
-    clearTimeout(deleteBtnTimerHandle);
-    deleteProjectBtn.textContent = 'X'
-  })
+  deleteProjectBtn.addEventListener('mouseover', ()=> {deleteBtnTimerHandle = setTimeout(() => { deleteProjectBtn.textContent = "X Delete Project"}, 200)})
+  deleteProjectBtn.addEventListener('mouseleave', () => {clearTimeout(deleteBtnTimerHandle);deleteProjectBtn.textContent = 'X'})
 
   createSidebar();
   nav.append(deleteProjectBtn, projectHeader, toDoBtn, projectBtn);
@@ -79,16 +66,16 @@ let sortItems = (e) => {
   }
   else if (e.target.options[e.target.selectedIndex].value === 'By Priority'){
     sortedSelect = 1;
-    refreshProject(currentProject, sortByPriority(currentProject));
+    refreshProject(currentProject, currentProject.sortByPriority());
   } 
   else if (e.target.options[e.target.selectedIndex].value === 'By Date') {
     sortedSelect = 2;
-    refreshProject(currentProject, sortByDate(currentProject));
+    refreshProject(currentProject, currentProject.sortByDate());
   } else {
     sortedSelect = 3;
     let project = new Project(currentProject.projectName);
-    project.toDoList = sortByDate(currentProject)
-    let newArr = sortByPriority(project);
+    project.toDoList = currentProject.sortByDate();
+    let newArr = project.sortByPriority();
     console.log(newArr);
     refreshProject(currentProject, newArr);
   }
@@ -120,6 +107,7 @@ let createSidebar = () => {
   let priorityOption = document.createElement('option');
   let dateOption = document.createElement('option');
   let prioDateOption = document.createElement('option');
+
   sortLabel.textContent = 'Sort Items'
   noneOption.textContent = 'None';
   priorityOption.textContent = 'By Priority';
@@ -152,7 +140,6 @@ let createSidebar = () => {
       selection.options[i].selected = 'selected';
     }
   }
-
 
   form.append(projectName, submitProjectForm);
   contentDiv.append(selectionLabel, selection, sortDiv, colorLabel, colorDiv, projectNameLabel, form);
@@ -221,6 +208,7 @@ let createContent = (project, list = []) => {
     let title = document.createElement('h3');
     let description = document.createElement('p');
     let dueDate = document.createElement('p');
+    dueDate.classList.add('item-date')
     let priority = document.createElement('span');
     let deleteBtn = document.createElement('button')
     deleteBtn.textContent = 'X';
@@ -241,35 +229,17 @@ let createContent = (project, list = []) => {
   main.append(itemArea);
 }
 
-let sortByDate = (project) => {
-  let newArr = new Project(project.projectName);
-  newArr.toDoList = [...project.toDoList]
-  newArr.toDoList.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
-  return newArr.toDoList;
-}
-
-let sortByPriority = (project) => {
-  let newArr = new Project(project.projectName);
-  newArr.toDoList = [...project.toDoList]
-  newArr.toDoList.sort((a, b) => b.priority - a.priority)
-  return newArr.toDoList;
-}
-
 let deleteToDoItem = (event) => {
   const index = event.target.parentNode.dataset.index
-  currentProject.toDoList.splice(index, 1);
-  listOfProjects.forEach(item => {
-    if (item.projectName === currentProject.projectName) {
-        item = currentProject
-        return;
-    }
-  })
-
-  localStorage.setItem('userProjects', JSON.stringify(listOfProjects));
+  deleteItem(currentProject, listOfProjects, index);
   refreshProject(currentProject);
 }
 
 let zoomItem = (e ,item) => {
+  if (sideBarActive) {
+    ActivateSidebar();
+  }
+  
   console.log(e.target);
   if (e.target.classList.contains('item-delete')){
     return;
@@ -278,12 +248,9 @@ let zoomItem = (e ,item) => {
   let contentDiv = document.createElement('div')
   let div = createModal(contentDiv);
 
-  let title = document.createElement('input')
-  title.setAttribute('id', 'title');
-  title.setAttribute('type', 'input')
-  title.value = item.title;
-  title.addEventListener('change', () => {item.title = title.value;})
-  let description = document.createElement('textarea');
+  let title = document.createElement('h2')
+  title.textContent = item.title;
+  let description = document.createElement('p');
   description.textContent = item.description;
   let date = document.createElement('p');
   date.textContent = item.dueDate;
@@ -368,30 +335,11 @@ let makeColorSection = () => {
 }
 
 let changeProjectColor = (color, currentColor, currentNavColor) => {
-  if(color === 'blue') {
-    currentProject.backgroundColor = 'blue-bg';
-    currentProject.navColor = 'blue-nav-bg';
-  }
-  if(color === 'red') {
-    currentProject.backgroundColor = 'red-bg';
-    currentProject.navColor = 'red-nav-bg';
-  }
-  if(color === 'green') {
-    currentProject.backgroundColor = 'green-bg';
-    currentProject.navColor = 'green-nav-bg';
-  }
-  if(color === 'orange') {
-    currentProject.backgroundColor = 'orange-bg';
-    currentProject.navColor = 'orange-nav-bg';
-  }
+
   const itemArea = document.querySelector('.to-do-area')
   const nav = document.querySelector('nav')
-  listOfProjects.forEach(item => {
-    if (item.projectName === currentProject.projectName) {
-      item = currentProject
-      console.log(currentProject)
-    }
-  })
+
+  saveProjectColor(currentProject, color, listOfProjects);
 
   itemArea.classList.remove(currentColor);
   nav.classList.remove(currentNavColor);
@@ -419,10 +367,7 @@ let submitNewProject = (e) => {
   else {
     let newProject = new Project(projectName);
     currentProject = newProject;
-    listOfProjects.push(currentProject);
-    
-    localStorage.setItem('userProjects', JSON.stringify(listOfProjects));
-    localStorage.setItem('currentProject', JSON.stringify(currentProject));
+    addNewProject(listOfProjects, currentProject);
     refreshProject(currentProject);
   }
 }
@@ -504,19 +449,9 @@ let submitNewItem = (e, project) => {
       err.textContent = 'No field can be left blank!';
       document.querySelector('.modal-content').prepend(err);
     }
-    
   } 
   else {
-    let date = new Date(dueDate);
-    project.toDoList.push(new ToDoItem(title, description, format(new Date(date.getTime() + date.getTimezoneOffset() * 60000), 'M/d/yyyy'), priority));
-    listOfProjects.forEach(item => {
-      if (item.projectName === project.projectName) {
-          item.toDoList = project.toDoList;
-          console.log('added new item');
-      }
-    })
-    localStorage.setItem('userProjects', JSON.stringify(listOfProjects));
-    console.log(listOfProjects);
+    addNewItem(listOfProjects, project, title, description, dueDate, priority)
     refreshProject(project);
   }
  
