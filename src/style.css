@@ -1,7 +1,3 @@
-html {
-  box-sizing: border-box;
-}
-
 *,
 *::before,
 *::after {
@@ -31,25 +27,29 @@ ul {
 
 html {
   font-family: Arial, Helvetica, sans-serif;
+  box-sizing: border-box;
 }
+
 html,
 body {
   height: 100%;
 }
+
 #content {
   transition: margin-right  0.5s ease-in-out;
 }
+
 .modal {
-  position: fixed; 
-  z-index: 3; 
-  padding-top: 100px; 
+  position: fixed;
+  z-index: 3;
+  padding-top: 100px;
   left: 0;
   top: 0;
-  width: 100%; 
-  height: 100%; 
-  overflow: auto; 
-  background-color: rgb(0,0,0); 
-  background-color: rgba(0,0,0,0.7); 
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0, 0, 0);
+  background-color: rgba(0, 0, 0, 0.7);
 }
 
 /* Modal Content */
@@ -65,13 +65,21 @@ body {
 .modal-content h2 {
   text-align: center;
 }
+
 .modal-content p {
   margin: 20px 0;
   font-size: 28px;
 }
 
-.modal-content input { 
+.modal-content input {
   font-size: 26px;
+}
+
+nav button {
+  transition: all 0.2s ease-in-out;
+  width: 75px;
+  box-shadow: 0 5px 8px -6px black;
+  border-radius: 10px;
 }
 
 .modal-content button {
@@ -95,161 +103,30 @@ nav {
   transition: all 0.2s ease-in-out;
   overflow: visible;
 }
-nav button {
-  transition: all 0.2s ease-in-out;
-  width: 75px;
-  box-shadow: 0 5px 8px -6px black;
-  border-radius: 10px;
-}
+
 nav button:hover {
   width: 200px;
 }
+
 .project-title {
   flex-grow: 1;
   text-align: center;
 }
 
-.to-do-area{
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
-  min-height: 100vh;
-  align-items: baseline;
-  transition: all 0.2s ease-in-out;
-}
-
-.color-selection {
-  display: flex;
-  justify-content: space-around;
-  margin: 2em;
-}
-
-.blue-bg {
-  background-image: linear-gradient(0deg, rgb(30, 53, 124), royalblue);
-}
-.blue-nav-bg{
-  background-color: rgb(30, 53, 124);
-}
-
-.red-bg {
-  background-image: linear-gradient(0deg, rgb(134, 10, 35), crimson);
-}
-.red-nav-bg {
-  background-color: rgb(134, 10, 35);
-}
-
-.green-bg {
-  background-image: linear-gradient(0deg, forestgreen, rgb(45, 189, 45));
-}
-
-.green-nav-bg {
-  background-color: forestgreen;
-}
-
-.orange-bg {
-  background-image: linear-gradient(0deg, rgb(182, 56, 10), coral);
-}
-
-.orange-nav-bg {
-  background-color:rgb(182, 56, 10);
-}
-
-.color-square{
-  height: 100px;
-  width: 200px;
-  border: 3px solid white;
-  transition: all 0.2s ease-in-out;
-}
-
-.color-square:hover{
-  transform: scale(1.1);
-}
-
-.to-do-item{
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  background-color: white;
-  border: 6px solid rgb(153, 153, 153);
-  width: 300px;
-  height: 300px;
-  margin: 20px;
-  transition: all 0.2s ease-in-out;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 1px 1px 5px 3px black;
-}
-.to-do-item:hover{
-  transform: scale(1.1);
-  box-shadow: 1px 1px 15px 5px black;
-}
-.to-do-item h3 {
-  text-align: center;
-  padding: 20px 0;
-  font-size: xx-large;
-}
-
-.to-do-item p {
-  text-align: center;
-  font-size: 32px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 2; /* number of lines to show */
-  -webkit-box-orient: vertical;
-  
-}
-
-.to-do-item p:nth-child(even)  {
-  font-size: 24px;
-
-}
-
-.item-date {
-  margin-top: auto;
-}
-.item-delete {
-  position: absolute;
-  right: 5px;
-  top: 5px;
-  width: fit-content;
-  border-radius: 50px;
-  z-index: 2;
-}
-
-.sidebar {
-  height: 100%; 
-  width: 0; 
-  position: fixed; 
-  z-index: 4;
-  top: 0;
-  right: 0; 
-  background-color: rgb(240, 240, 240); 
-  overflow-x: hidden;
-  padding-top: 60px; 
-  transition: all 0.5s ease-in-out; 
-  font-size: 1.3rem;
-  
-}
-
-.sidebar p{
+.sidebar p {
   margin: 10px 0;
 }
 
-.priority-set {
-  display: block;
-  width: 100%;
-  height: 20px;
-}
-
-.low-priority {
-  background-color: lightgreen;
-}
-
-.mid-priority {
-  background-color: goldenrod;
-}
-
-.high-priority {
-  background-color: crimson;
+.sidebar {
+  height: 100%;
+  width: 0;
+  position: fixed;
+  z-index: 4;
+  top: 0;
+  right: 0;
+  background-color: rgb(240, 240, 240);
+  overflow-x: hidden;
+  padding-top: 60px;
+  transition: all 0.5s ease-in-out;
+  font-size: 1.3rem;
 }

@@ -3,6 +3,8 @@ import projectView from './projectView';
 import Project from './projectClass';
 import ToDoItem from './toDoClass';
 import './style.css';
+import './colors.css';
+import './items.css';
 
 let userProjects = [];
 if (localStorage.getItem('userProjects')) {

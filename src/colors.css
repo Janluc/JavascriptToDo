@@ -1,0 +1,60 @@
+.color-square {
+  height: 100px;
+  width: 200px;
+  border: 3px solid white;
+  transition: all 0.2s ease-in-out;
+}
+
+.color-square:hover {
+  transform: scale(1.1);
+}
+
+.color-selection {
+  display: flex;
+  justify-content: space-around;
+  margin: 2em;
+}
+
+.blue-bg {
+  background-image: linear-gradient(0deg, rgb(30, 53, 124), royalblue);
+}
+
+.blue-nav-bg {
+  background-color: rgb(30, 53, 124);
+}
+
+.red-bg {
+  background-image: linear-gradient(0deg, rgb(134, 10, 35), crimson);
+}
+
+.red-nav-bg {
+  background-color: rgb(134, 10, 35);
+}
+
+.green-bg {
+  background-image: linear-gradient(0deg, forestgreen, rgb(45, 189, 45));
+}
+
+.green-nav-bg {
+  background-color: forestgreen;
+}
+
+.orange-bg {
+  background-image: linear-gradient(0deg, rgb(182, 56, 10), coral);
+}
+
+.orange-nav-bg {
+  background-color: rgb(182, 56, 10);
+}
+
+.low-priority {
+  background-color: lightgreen;
+}
+
+.mid-priority {
+  background-color: goldenrod;
+}
+
+.high-priority {
+  background-color: crimson;
+}
